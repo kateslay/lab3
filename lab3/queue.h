@@ -13,6 +13,7 @@ typedef struct Elem {
 typedef struct {
     Elem* BegL;    // Начало очереди
     Elem* EndL;    // Конец очереди
+    int size;      // Количество элементов
 } Queue;
 
 
@@ -21,6 +22,5 @@ void enqueue(Queue* q, int value);
 void printQueue(Queue* q);
 void freeQueue(Queue* q);
 void writeToFile(const char* filename, Queue* q);
-int sizeQueue(Queue* q);
 
 #endif

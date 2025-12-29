@@ -1,51 +1,32 @@
 #include "queue.h"
 
 
-//инициализация очереди
+// ????????????? ???????
 void initQueue(Queue* q) {
     q->BegL = NULL;
     q->EndL = NULL;
+    q->size = 0;
 }
 
-//добавление элемента в конец очереди
+// ?????????? ???????? ? ???????
 void enqueue(Queue* q, int value) {
     Elem* newElem = (Elem*)malloc(sizeof(Elem));
     newElem->data = value; 
     newElem->next = NULL;
     
-    if (q->BegL == NULL) {
-        //если в очереди еще никого нет
+    if (q->size == 0) {
+        // ???? ??????? ?????
         q->BegL = newElem;
         q->EndL = newElem;
     } else {
-        // добавить в конец очереди
+        // ???? ? ??????? ??? ???? ????????
         q->EndL->next = newElem;
         q->EndL = newElem;
     }
+    q->size++;
 }
 
-//функция считает количество элементов в очереди
-int sizeQueue(Queue* q){
-    int count = 0;
-    Elem* current = q->BegL;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
-
-
-void printQueue(Queue* q) {
-    printf("Очередь:");
-    Elem* current = q->BegL;
-    while (current != NULL) {
-        printf("%d ", current->data);
-        current = current->next;
-    }
-    printf("\n");
-}
-
+// ??????? ??????
 void freeQueue(Queue* q) {
     Elem* current = q->BegL;
     Elem* next;
@@ -57,9 +38,11 @@ void freeQueue(Queue* q) {
     }  
     q->BegL = NULL;
     q->EndL = NULL;
+    q->size = 0;
 }
 
 
+// ?????? ????? ? ????
 void writeToFile(const char* filename, Queue* q) {
     FILE* file = fopen(filename, "w");
     
@@ -67,7 +50,7 @@ void writeToFile(const char* filename, Queue* q) {
         return;
     }
     
-
+    // ?????????? ????? ?? ??????? ? ????
     Elem* current = q->BegL;
     while (current != NULL) {
         fprintf(file, "%d ", current->data);
@@ -75,4 +58,5 @@ void writeToFile(const char* filename, Queue* q) {
     }
     
     fclose(file);
+    printf("????? ???????? ? ???? '%s'\n", filename);
 }

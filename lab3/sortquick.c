@@ -2,21 +2,14 @@
 #include <stdio.h>
 #include <time.h>
 
-// Вспомогательная функция для подсчета элементов
-int countElements(Queue* q) {
-    int count = 0;
-    Elem* current = q->BegL;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
-
 // Вспомогательная функция для получения элемента по индексу
 Elem* getElemAt(Queue* q, int index) {
+    if (index < 0 || index >= q->size) {
+        return NULL;
+    }
+    
     Elem* current = q->BegL;
-    for (int i = 0; i < index && current != NULL; i++) {
+    for (int i = 0; i < index; i++) {
         current = current->next;
     }
     return current;
@@ -77,18 +70,18 @@ void quickSortRecursive(Queue* q, int left, int right) {
 
 // Основная функция сортировки Хоара (аналогично selectionSort)
 void quickSort(Queue* q) {
-    if (q == NULL || q->BegL == NULL || q->BegL->next == NULL) {
+    if (q->size <= 1) {
         return;
     }
 
     clock_t start = clock(); // Начинаем замер времени
 
     // Запускаем рекурсивную сортировку
-    quickSortRecursive(q, 0, countElements(q - 1));
+    quickSortRecursive(q, 0, q->size - 1);
 
     clock_t end = clock(); // Заканчиваем замер времени
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     // Вывод результатов
-    printf("%d элементов за %.6f секунд\n", countElements(q), time_taken);
+    printf("%d элементов за %.6f секунд\n", q->size, time_taken);
 }
