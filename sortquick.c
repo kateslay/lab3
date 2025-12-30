@@ -1,94 +1,67 @@
 #include "sortquick.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
+#include "queue.h"
+#include <locale.h>
 
-// Вспомогательная функция для подсчета элементов
-int countElements(Queue* q) {
-    int count = 0;
-    Elem* current = q->BegL;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
-
-// Вспомогательная функция для получения элемента по индексу
-Elem* getElemAt(Queue* q, int index) {
-    Elem* current = q->BegL;
-    for (int i = 0; i < index && current != NULL; i++) {
-        current = current->next;
-    }
-    return current;
-}
-
-// Вспомогательная функция для обмена значениями
-void swapValues(Elem* a, Elem* b) {
-    int temp = a->data;
-    a->data = b->data;
-    b->data = temp;
-}
-
-// Рекурсивная часть алгоритма Хоара
-void quickSortRecursive(Queue* q, int left, int right) {
-    if (left >= right) {
-        return;  // Базовый случай рекурсии
-    }
-    
-    // Выбираем опорный элемент (середина)
-    int pivotIndex = (left + right) / 2;
-    Elem* pivotElem = getElemAt(q, pivotIndex);
-    int pivotValue = pivotElem->data;
-    
-    // Указатели для разделения
-    int i = left;
-    int j = right;
-    
-    // Разделение массива относительно опорного элемента
-    while (i <= j) {
-        // Ищем элемент слева, который больше или равен опорному
-        while (getElemAt(q, i)->data < pivotValue) {
-            i++;
-        }
-        
-        // Ищем элемент справа, который меньше или равен опорному
-        while (getElemAt(q, j)->data > pivotValue) {
-            j--;
-        }
-        
-        // Если указатели не пересеклись, меняем элементы местами
-        if (i <= j) {
-            if (i != j) {
-                swapValues(getElemAt(q, i), getElemAt(q, j));
-            }
-            i++;
-            j--;
-        }
-    }
-    
-    // Рекурсивно сортируем левую и правую части
-    if (left < j) {
-        quickSortRecursive(q, left, j);
-    }
-    if (i < right) {
-        quickSortRecursive(q, i, right);
-    }
-}
-
-// Основная функция сортировки Хоара (аналогично selectionSort)
-void quickSort(Queue* q) {
+//����������� ����� ���������� �����
+void hoareSortRecursive(Queue* q) {
     if (q == NULL || q->BegL == NULL || q->BegL->next == NULL) {
         return;
     }
 
-    clock_t start = clock(); // Начинаем замер времени
+    int pivot = dequeue(q);
 
-    // Запускаем рекурсивную сортировку
-    quickSortRecursive(q, 0, countElements(q - 1));
+    Queue left, right;
+    initQueue(&left);
+    initQueue(&right);
 
-    clock_t end = clock(); // Заканчиваем замер времени
+    // ������������ �������� ������������ ��������
+    while (!isQueueEmpty(q)) {
+        int value = dequeue(q);
+        if (value < pivot) {
+            enqueue(&left, value);
+        }
+        else {
+            enqueue(&right, value);
+        }
+    }
+
+    hoareSortRecursive(&left);
+    hoareSortRecursive(&right);
+
+
+    // ������� �������� ������ pivot
+    while (!isQueueEmpty(&left)) {
+        enqueue(q, dequeue(&left));
+    }
+
+    enqueue(q, pivot);
+
+    // �������� ������ pivot
+    while (!isQueueEmpty(&right)) {
+        enqueue(q, dequeue(&right));
+    }
+
+    freeQueue(&left);
+    freeQueue(&right);
+}
+
+// �������� ������� ���������� ����� 
+void quickSort(Queue* q) {
+    setlocale(LC_ALL, "Rus");
+    if (q == NULL || q->BegL == NULL || q->BegL->next == NULL) {
+        return;
+    }
+
+    clock_t start = clock(); // �������� ����� �������
+
+    hoareSortRecursive(q);
+
+    clock_t end = clock(); // ����������� ����� �������
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    // Вывод результатов
-    printf("%d элементов за %.6f секунд\n", countElements(q), time_taken);
+    // ����� �����������
+    printf("%d ��������� �� %.9f ������\n", countElements(q), time_taken);
 }

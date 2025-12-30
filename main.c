@@ -2,18 +2,34 @@
 #include "queue.h"
 #include "sortquick.h"
 #include "sortselec.h"
+#include <string.h>
 #include <locale.h>
 
-int main() {
+int main(int argc, char* argv[]) {
     setlocale(LC_ALL,"Rus");
     char exit = '1';
-    int choice;
+    char choice;
+
+
+    // Режим работы с файлом: --file filename
+    if (argc == 3 && strcmp(argv[1], "--file") == 0) {
+        char* filename = argv[2];
+
+        // Проверяем существование файлов
+        printf("Предыдущий введенный ряд:\n");
+        display_file_content("initrow.txt", "");
+        
+        printf("\nОтсортированный ряд:\n");
+        display_file_content("sorted.txt", "");
+
+        return 0;
+    }
+
 
     while (exit != '0'){
         Queue q;
         int num; 
-    
-        // Инициализация очереди
+
         initQueue(&q);
         
         printf("Введите последовательность чисел через пробел (0 - конец):\n");
@@ -22,26 +38,26 @@ int main() {
             enqueue(&q, num);
             scanf("%d", &num);
         }
-    
-        // Проверка, что очередь не пуста
+
         if (q.BegL == NULL) {
             freeQueue(&q);
-
             printf("Вы хотите повторить? 0 - выход:\n");
             scanf("%s", &exit);
             continue;
         }
 
         printf("В очереди %d чисел\n", sizeQueue(&q));
+        printf("Исходная очередь: ");
+        printQueue(&q);
 
         writeToFile("initrow.txt", &q);
 
         printf("Выберите метод сортировки. 1 - сортировка прямым выбором, 2 - быстрая сортировка\n");
-        scanf("%d", &choice);
-        if (choice == 1){ 
+        scanf("%s", &choice);
+        if (choice == '1'){ 
             selectionSort(&q);
         }
-        else if (choice == 2){
+        else if (choice == '2'){
             quickSort(&q);
         }
         else {
@@ -49,7 +65,10 @@ int main() {
             selectionSort(&q);
         }
 
-        // Запись отсортированных данных в другой файл
+        printf("Отсортированная очередь: ");
+        printQueue(&q);
+
+        // Сохраняем отсортированную очередь в файл
         writeToFile("sorted.txt", &q);
     
         freeQueue(&q);

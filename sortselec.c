@@ -1,19 +1,11 @@
 #include "sortselec.h"
 #include <stdio.h>
 #include <time.h>
-
-
-static int countElements(Queue* q) {
-    int count = 0;
-    Elem* current = q->BegL;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
+#include <locale.h>
+#include "queue.h"
 
 void selectionSort(Queue* q) {
+    setlocale(LC_ALL, "Rus");
 
     if (q->BegL == NULL || q->BegL->next == NULL) {
     return;  // Нечего сортировать
@@ -23,13 +15,12 @@ void selectionSort(Queue* q) {
     
     Elem* i = q->BegL;
 
-    // Внешний цикл: проходим по всем элементам, кроме последнего
     while (i != NULL && i->next != NULL) {
         // Предполагаем, что текущий элемент - минимальный
         Elem* min = i; //i - текущий элемент
         Elem* j = i->next;
         
-        // Внутренний цикл: ищем минимальный элемент в оставшейся части
+        //ищем минимальный элемент в оставшейся части
         while (j != NULL) {
             if (j->data < min->data) {
                 min = j;
@@ -44,12 +35,11 @@ void selectionSort(Queue* q) {
             min->data = temp;
         }
         
-        // Переходим к следующему элементу
         i = i->next;
     }
     clock_t end = clock(); // Заканчиваем замер времени
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     // Вывод результатов
-    printf("%d элементов за %.6f секунд\n", countElements(q), time_taken);
+    printf("%d элементов за %.9f секунд\n", countElements(q), time_taken);
 }

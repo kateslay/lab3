@@ -4,5 +4,7 @@
 #include "queue.h"
 
 void quickSort(Queue* q);
+void hoareSortRecursive(Queue* q);
+
 
 #endif

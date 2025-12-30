@@ -1,4 +1,5 @@
 #include "queue.h"
+#include <string.h>
 
 
 //инициализация очереди
@@ -37,7 +38,6 @@ int sizeQueue(Queue* q){
 
 
 void printQueue(Queue* q) {
-    printf("Очередь:");
     Elem* current = q->BegL;
     while (current != NULL) {
         printf("%d ", current->data);
@@ -75,4 +75,63 @@ void writeToFile(const char* filename, Queue* q) {
     }
     
     fclose(file);
+}
+
+int countElements(Queue* q) {
+    int count = 0;
+    Elem* current = q->BegL;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
+
+
+// Функция для чтения и отображения содержимого файла
+void display_file_content(const char* filename, const char* description) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Файл '%s' не найден.\n", filename);
+        return;
+    }
+
+    printf("%s:\n", description);
+
+    char line[1024];
+    if (fgets(line, sizeof(line), file) != NULL) {
+        size_t len = strlen(line);
+        if (len > 0 && line[len-1] == '\n') {
+            line[len-1] = '\0';
+        }
+        printf("%s\n", line);
+    } else {
+        printf("Файл пуст\n");
+    }
+
+    fclose(file);
+}
+
+// Проверка на пустоту очереди
+int isQueueEmpty(Queue* q) {
+    return q->BegL == NULL;
+}
+
+
+// Извлечение элемента из начала очереди
+int dequeue(Queue* q) {
+    if (isQueueEmpty(q)) {
+        return -1; 
+    }
+    
+    Elem* temp = q->BegL;
+    int value = temp->data;
+    
+    q->BegL = q->BegL->next;
+    if (q->BegL == NULL) {
+        q->EndL = NULL;
+    }
+    
+    free(temp);
+    return value;
 }
