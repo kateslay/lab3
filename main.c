@@ -11,9 +11,7 @@ int main(int argc, char* argv[]) {
     char choice;
 
 
-    // Режим работы с файлом: --file filename
     if (argc == 3 && strcmp(argv[1], "--file") == 0) {
-        char* filename = argv[2];
 
         // Проверяем существование файлов
         printf("Предыдущий введенный ряд:\n");
@@ -39,6 +37,7 @@ int main(int argc, char* argv[]) {
             scanf("%d", &num);
         }
 
+        //ввели только 0
         if (q.BegL == NULL) {
             freeQueue(&q);
             printf("Вы хотите повторить? 0 - выход:\n");

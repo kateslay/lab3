@@ -1,5 +1,4 @@
 #include "sortselec.h"
-#include <stdio.h>
 #include <time.h>
 #include <locale.h>
 #include "queue.h"
@@ -7,39 +6,119 @@
 void selectionSort(Queue* q) {
     setlocale(LC_ALL, "Rus");
 
-    if (q->BegL == NULL || q->BegL->next == NULL) {
-    return;  // Нечего сортировать
+    if (q == NULL || q->BegL == NULL || q->BegL->next == NULL) {
+        return;
     }
 
-    clock_t start = clock(); // Начинаем замер времени
-    
-    Elem* i = q->BegL;
+    int n = sizeQueue(q);
+    int repetitions; 
 
-    while (i != NULL && i->next != NULL) {
-        // Предполагаем, что текущий элемент - минимальный
-        Elem* min = i; //i - текущий элемент
-        Elem* j = i->next;
+    if (n < 10) repetitions = 100000;
+    else if (n < 50) repetitions = 10000;  
+    else if (n < 100) repetitions = 5000;    
+    else if (n < 500) repetitions = 1000;  
+    else if (n < 1000) repetitions = 500;   
+    else if (n < 5000) repetitions = 100;    
+    else if (n < 10000) repetitions = 50;     
+    else if (n < 50000) repetitions = 10;   
+    else repetitions = 5;  
+
+    int* original_data = (int*)malloc(n * sizeof(int));
+    Elem* current = q->BegL;
+    for (int i = 0; i < n; i++) {
+        original_data[i] = current->data;
+        current = current->next;
+    }
+
+    clock_t total_start = clock();
+
+    for (int r = 0; r < repetitions; r++) {
+        freeQueue(q);
+        initQueue(q);
+        for (int i = 0; i < n; i++) {
+            enqueue(q, original_data[i]);
+        }
+
+
+        Elem* current = q->BegL;
+        Elem* prev_current = NULL;
         
-        //ищем минимальный элемент в оставшейся части
-        while (j != NULL) {
-            if (j->data < min->data) {
-                min = j;
+        while (current != NULL && current->next != NULL) {
+
+        Elem* min_elem = current;     // ������� current �����������
+        Elem* prev_min = prev_current;// ���������� ��� ������������
+        Elem* runner = current->next; // ����� ��� ������
+        Elem* prev_runner = current;  // ���������� ��� ������
+            
+            while (runner != NULL) {
+                if (runner->data < min_elem->data) {
+                    min_elem = runner;
+                    prev_min = prev_runner;
+                }
+                prev_runner = runner;
+                runner = runner->next;
             }
-            j = j->next;
-        }
-        
-        // Если нашли элемент меньше текущего, меняем их значения
-        if (min != i) {
-            int temp = i->data;
-            i->data = min->data;
-            min->data = temp;
-        }
-        
-        i = i->next;
-    }
-    clock_t end = clock(); // Заканчиваем замер времени
-    double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+            
+            if (min_elem != current) {
+                if (current->next == min_elem) { //�������� ��������
+                    if (prev_current != NULL) {
+                        prev_current->next = min_elem;
+                    } else {
+                        q->BegL = min_elem;
+                    }
+                    
+                    current->next = min_elem->next;
+                    min_elem->next = current;
+                    
+                    if (current->next == NULL) {
+                        q->EndL = current;
+                    }
+                    
+                    prev_current = min_elem;
+                } 
 
-    // Вывод результатов
-    printf("%d элементов за %.9f секунд\n", countElements(q), time_taken);
+                else {
+
+                    Elem* current_next = current->next;
+                    Elem* min_next = min_elem->next;
+                    
+                    if (prev_current != NULL) {
+                        prev_current->next = min_elem;
+                    } else {
+                        q->BegL = min_elem; 
+                    }
+                    
+                    if (prev_min != NULL) {
+                        prev_min->next = current;
+                    }
+                    
+                    min_elem->next = current_next;
+                    current->next = min_next;
+                    
+                    if (min_elem->next == NULL) {
+                        q->EndL = min_elem;
+                    }
+                    if (current->next == NULL) {
+                        q->EndL = current;
+                    }
+                    
+                    prev_current = min_elem;
+                    current = min_elem->next;
+                    continue; 
+                }
+            }
+
+            prev_current = current;
+            current = current->next;
+        }
+    }
+    
+    clock_t total_end = clock();
+    free(original_data);
+
+
+    double total_seconds = (double)(total_end - total_start) / CLOCKS_PER_SEC;
+    double avg_microseconds = (total_seconds / repetitions) * 1000000.0;
+
+    printf("%d ���������: %.3f ���\n", n, avg_microseconds);
 }

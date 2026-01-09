@@ -23,12 +23,10 @@ void freeQueue(Queue* q);
 void writeToFile(const char* filename, Queue* q);
 int sizeQueue(Queue* q);
 
-int countElements(Queue* q);
-
 void display_file_content(const char* filename, const char* description);
 
 
-int isQueueEmpty(Queue* q);  // Проверка на пустоту
+int isQueueEmpty(Queue* q);
 int dequeue(Queue* q); 
 
 #endif

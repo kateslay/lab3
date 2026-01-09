@@ -19,13 +19,12 @@ void enqueue(Queue* q, int value) {
         q->BegL = newElem;
         q->EndL = newElem;
     } else {
-        // добавить в конец очереди
         q->EndL->next = newElem;
         q->EndL = newElem;
     }
 }
 
-//функция считает количество элементов в очереди
+//количество элементов в очереди
 int sizeQueue(Queue* q){
     int count = 0;
     Elem* current = q->BegL;
@@ -35,7 +34,6 @@ int sizeQueue(Queue* q){
     }
     return count;
 }
-
 
 void printQueue(Queue* q) {
     Elem* current = q->BegL;
@@ -67,7 +65,6 @@ void writeToFile(const char* filename, Queue* q) {
         return;
     }
     
-
     Elem* current = q->BegL;
     while (current != NULL) {
         fprintf(file, "%d ", current->data);
@@ -75,16 +72,6 @@ void writeToFile(const char* filename, Queue* q) {
     }
     
     fclose(file);
-}
-
-int countElements(Queue* q) {
-    int count = 0;
-    Elem* current = q->BegL;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-    return count;
 }
 
 
@@ -118,7 +105,7 @@ int isQueueEmpty(Queue* q) {
 }
 
 
-// Извлечение элемента из начала очереди
+// удаление элемента
 int dequeue(Queue* q) {
     if (isQueueEmpty(q)) {
         return -1; 
