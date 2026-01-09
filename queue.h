@@ -23,7 +23,7 @@ void freeQueue(Queue* q);
 void writeToFile(const char* filename, Queue* q);
 int sizeQueue(Queue* q);
 
-void display_file_content(const char* filename, const char* description);
+void display_file_content(const char* filename);
 
 
 int isQueueEmpty(Queue* q);

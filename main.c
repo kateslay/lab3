@@ -13,12 +13,11 @@ int main(int argc, char* argv[]) {
 
     if (argc == 3 && strcmp(argv[1], "--file") == 0) {
 
-        // Проверяем существование файлов
         printf("Предыдущий введенный ряд:\n");
-        display_file_content("initrow.txt", "");
+        display_file_content("initrow.txt");
         
         printf("\nОтсортированный ряд:\n");
-        display_file_content("sorted.txt", "");
+        display_file_content("sorted.txt");
 
         return 0;
     }

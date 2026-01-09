@@ -63,14 +63,14 @@ void selectionSort(Queue* q) {
                 if (current->next == min_elem) { //соседние элементы
                     if (prev_current != NULL) {
                         prev_current->next = min_elem;
-                    } else {
+                    } else { // нынешний элемент первый
                         q->BegL = min_elem;
                     }
                     
                     current->next = min_elem->next;
                     min_elem->next = current;
                     
-                    if (current->next == NULL) {
+                    if (current->next == NULL) { //если текущий последний
                         q->EndL = current;
                     }
                     
@@ -84,7 +84,7 @@ void selectionSort(Queue* q) {
                     
                     if (prev_current != NULL) {
                         prev_current->next = min_elem;
-                    } else {
+                    } else { //нынешний первый
                         q->BegL = min_elem; 
                     }
                     
@@ -95,7 +95,7 @@ void selectionSort(Queue* q) {
                     min_elem->next = current_next;
                     current->next = min_next;
                     
-                    if (min_elem->next == NULL) {
+                    if (min_elem->next == NULL) { //если минимальный последний
                         q->EndL = min_elem;
                     }
                     if (current->next == NULL) {
@@ -118,7 +118,7 @@ void selectionSort(Queue* q) {
 
 
     double total_seconds = (double)(total_end - total_start) / CLOCKS_PER_SEC;
-    double avg_microseconds = (total_seconds / repetitions) * 1000000.0;
+    double mcs = (total_seconds / repetitions) * 1000000.0;
 
-    printf("%d элементов: %.3f мкс\n", n, avg_microseconds);
+    printf("%d элементов: %.3f мкс\n", n, mcs);
 }

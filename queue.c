@@ -76,14 +76,12 @@ void writeToFile(const char* filename, Queue* q) {
 
 
 // Функция для чтения и отображения содержимого файла
-void display_file_content(const char* filename, const char* description) {
+void display_file_content(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         printf("Файл '%s' не найден.\n", filename);
         return;
     }
-
-    printf("%s:\n", description);
 
     char line[1024];
     if (fgets(line, sizeof(line), file) != NULL) {

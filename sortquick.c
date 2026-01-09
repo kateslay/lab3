@@ -118,7 +118,7 @@ void quickSort(Queue* q) {
 
     // Вычисляем среднее время в микросекундах
     double total_seconds = (double)(total_end - total_start) / CLOCKS_PER_SEC;
-    double avg_microseconds = (total_seconds / repetitions) * 1000000.0; //ср время в мкс
+    double mcs = (total_seconds / repetitions) * 1000000.0; //ср время в мкс
 
-    printf("%d элементов: %.3f мкс\n", n, avg_microseconds);
+    printf("%d элементов: %.3f мкс\n", n, mcs);
 }
