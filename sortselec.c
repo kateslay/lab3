@@ -23,32 +23,35 @@ void selectionSort(Queue* q) {
     else if (n < 50000) repetitions = 10;
     else repetitions = 5;
 
-    int* original_data = (int*)malloc(n * sizeof(int));
+    Queue shablon;
+    initQueue(&shablon);
+
+    // Копируем исходные данные в шаблон
     Elem* current = q->BegL;
-    for (int i = 0; i < n; i++) {
-        original_data[i] = current->data;
+    while (current != NULL) {
+        enqueue(&shablon, current->data);
         current = current->next;
     }
 
     clock_t start = clock();
 
     for (int r = 0; r < repetitions; r++) {
-        Queue original_copy;
-        initQueue(&original_copy);
-
-        Elem* current = q->BegL;
-        while (current != NULL) {
-            enqueue(&original_copy, current->data);
-            current = current->next;
-        }
-
         freeQueue(q);
         initQueue(q);
 
-        while (!isQueueEmpty(&original_copy)) {
-            enqueue(q, dequeue(&original_copy));
+        // временная копия шаблона
+        Queue shabCopy;
+        initQueue(&shabCopy);
+        Elem* temp_elem = shablon.BegL;
+        while (temp_elem != NULL) {
+            enqueue(&shabCopy, temp_elem->data);
+            temp_elem = temp_elem->next;
         }
 
+        // Восстанавливаем q из временной копии
+        while (!isQueueEmpty(&shabCopy)) {
+            enqueue(q, dequeue(&shabCopy));
+        }
 
         Queue sorted;
         initQueue(&sorted); 
@@ -59,7 +62,7 @@ void selectionSort(Queue* q) {
             Queue temp; // неотсортированные данные
             initQueue(&temp); 
 
-            // Ищем минимальный среди оставшихся
+            // Ищем минимальный
             while (!isQueueEmpty(q)) {
                 int el = dequeue(q);
                 if (el < min) {
@@ -85,7 +88,7 @@ void selectionSort(Queue* q) {
     }
 
     clock_t end = clock();
-    free(original_data);
+    freeQueue(&shablon);
 
     double seconds = (double)(end - start) / CLOCKS_PER_SEC;
     double mcs = (seconds / repetitions) * 1000000.0;
