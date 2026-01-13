@@ -92,13 +92,13 @@ void quickSort(Queue* q) {
     else if (n < 50000) repetitions = 10;   
     else repetitions = 5;     
 
+    Queue original_template;
+    initQueue(&original_template);
 
-    // Сохраняем исходные данные
-    int* original_data = (int*)malloc(n * sizeof(int));
-    Elem* current = q->BegL;
-    for (int i = 0; i < n; i++) {
-        original_data[i] = current->data;
-        current = current->next;
+    Elem* original_current = q->BegL;
+    while (original_current != NULL) {
+        enqueue(&original_template, original_current->data);
+        original_current = original_current->next;
     }
 
     clock_t total_start = clock();
@@ -106,15 +106,24 @@ void quickSort(Queue* q) {
     for (int r = 0; r < repetitions; r++) {
         freeQueue(q);
         initQueue(q);
-        for (int i = 0; i < n; i++) {
-            enqueue(q, original_data[i]);
+
+        Queue temp_copy;
+        initQueue(&temp_copy);
+        Elem* temp_elem = original_template.BegL;
+        while (temp_elem != NULL) {
+            enqueue(&temp_copy, temp_elem->data);
+            temp_elem = temp_elem->next;
+        }
+
+        while (!isQueueEmpty(&temp_copy)) {
+            enqueue(q, dequeue(&temp_copy));
         }
 
         hoareSortRecursive(q);
     }
 
     clock_t total_end = clock();
-    free(original_data);
+    freeQueue(&original_template);
 
     // Вычисляем среднее время в микросекундах
     double total_seconds = (double)(total_end - total_start) / CLOCKS_PER_SEC;

@@ -11,17 +11,17 @@ void selectionSort(Queue* q) {
     }
 
     int n = sizeQueue(q);
-    int repetitions; 
+    int repetitions;
 
     if (n < 10) repetitions = 100000;
-    else if (n < 50) repetitions = 10000;  
-    else if (n < 100) repetitions = 5000;    
-    else if (n < 500) repetitions = 1000;  
-    else if (n < 1000) repetitions = 500;   
-    else if (n < 5000) repetitions = 100;    
-    else if (n < 10000) repetitions = 50;     
-    else if (n < 50000) repetitions = 10;   
-    else repetitions = 5;  
+    else if (n < 50) repetitions = 10000;
+    else if (n < 100) repetitions = 5000;
+    else if (n < 500) repetitions = 1000;
+    else if (n < 1000) repetitions = 500;
+    else if (n < 5000) repetitions = 100;
+    else if (n < 10000) repetitions = 50;
+    else if (n < 50000) repetitions = 10;
+    else repetitions = 5;
 
     int* original_data = (int*)malloc(n * sizeof(int));
     Elem* current = q->BegL;
@@ -30,95 +30,65 @@ void selectionSort(Queue* q) {
         current = current->next;
     }
 
-    clock_t total_start = clock();
+    clock_t start = clock();
 
     for (int r = 0; r < repetitions; r++) {
-        freeQueue(q);
-        initQueue(q);
-        for (int i = 0; i < n; i++) {
-            enqueue(q, original_data[i]);
-        }
-
+        Queue original_copy;
+        initQueue(&original_copy);
 
         Elem* current = q->BegL;
-        Elem* prev_current = NULL;
-        
-        while (current != NULL && current->next != NULL) {
-
-        Elem* min_elem = current;     // считаем current минимальным
-        Elem* prev_min = prev_current;// Предыдущий для минимального
-        Elem* runner = current->next; // Бегун для поиска
-        Elem* prev_runner = current;  // Предыдущий для бегуна
-            
-            while (runner != NULL) {
-                if (runner->data < min_elem->data) {
-                    min_elem = runner;
-                    prev_min = prev_runner;
-                }
-                prev_runner = runner;
-                runner = runner->next;
-            }
-            
-            if (min_elem != current) {
-                if (current->next == min_elem) { //соседние элементы
-                    if (prev_current != NULL) {
-                        prev_current->next = min_elem;
-                    } else { // нынешний элемент первый
-                        q->BegL = min_elem;
-                    }
-                    
-                    current->next = min_elem->next;
-                    min_elem->next = current;
-                    
-                    if (current->next == NULL) { //если текущий последний
-                        q->EndL = current;
-                    }
-                    
-                    prev_current = min_elem;
-                } 
-
-                else {
-
-                    Elem* current_next = current->next;
-                    Elem* min_next = min_elem->next;
-                    
-                    if (prev_current != NULL) {
-                        prev_current->next = min_elem;
-                    } else { //нынешний первый
-                        q->BegL = min_elem; 
-                    }
-                    
-                    if (prev_min != NULL) {
-                        prev_min->next = current;
-                    }
-                    
-                    min_elem->next = current_next;
-                    current->next = min_next;
-                    
-                    if (min_elem->next == NULL) { //если минимальный последний
-                        q->EndL = min_elem;
-                    }
-                    if (current->next == NULL) {
-                        q->EndL = current;
-                    }
-                    
-                    prev_current = min_elem;
-                    current = min_elem->next;
-                    continue; 
-                }
-            }
-
-            prev_current = current;
+        while (current != NULL) {
+            enqueue(&original_copy, current->data);
             current = current->next;
         }
+
+        freeQueue(q);
+        initQueue(q);
+
+        while (!isQueueEmpty(&original_copy)) {
+            enqueue(q, dequeue(&original_copy));
+        }
+
+
+        Queue sorted;
+        initQueue(&sorted); 
+
+        while (!isQueueEmpty(q)) {
+            int min = dequeue(q);
+            
+            Queue temp; // неотсортированные данные
+            initQueue(&temp); 
+
+            // Ищем минимальный среди оставшихся
+            while (!isQueueEmpty(q)) {
+                int el = dequeue(q);
+                if (el < min) {
+                    enqueue(&temp, min); 
+                    min = el;           
+                }
+                else {
+                    enqueue(&temp, el);  
+                }
+            }
+
+            enqueue(&sorted, min);//минимальный элемент в отсортированную очередь
+
+            while (!isQueueEmpty(&temp)) {
+                enqueue(q, dequeue(&temp));
+            }
+        }
+
+
+        while (!isQueueEmpty(&sorted)) {
+            enqueue(q, dequeue(&sorted));
+        }
     }
-    
-    clock_t total_end = clock();
+
+    clock_t end = clock();
     free(original_data);
 
-
-    double total_seconds = (double)(total_end - total_start) / CLOCKS_PER_SEC;
-    double mcs = (total_seconds / repetitions) * 1000000.0;
+    double seconds = (double)(end - start) / CLOCKS_PER_SEC;
+    double mcs = (seconds / repetitions) * 1000000.0;
 
     printf("%d элементов: %.3f мкс\n", n, mcs);
 }
