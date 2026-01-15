@@ -9,8 +9,7 @@ int main(int argc, char* argv[]) {
     setlocale(LC_ALL,"Rus");
     char exit = '1';
     char choice;
-
-
+  
     if (argc == 3 && strcmp(argv[1], "--file") == 0) {
 
         printf("Предыдущий введенный ряд:\n");
@@ -21,7 +20,6 @@ int main(int argc, char* argv[]) {
 
         return 0;
     }
-
 
     while (exit != '0'){
         Queue q;
@@ -36,11 +34,11 @@ int main(int argc, char* argv[]) {
             scanf("%d", &num);
         }
 
-        //ввели только 0
+        // ввели только 0
         if (q.BegL == NULL) {
             freeQueue(&q);
             printf("Вы хотите повторить? 0 - выход:\n");
-            scanf("%s", &exit);
+            scanf(" %c", &exit);
             continue;
         }
 
@@ -51,11 +49,12 @@ int main(int argc, char* argv[]) {
         writeToFile("initrow.txt", &q);
 
         printf("Выберите метод сортировки. 1 - сортировка прямым выбором, 2 - быстрая сортировка\n");
-        scanf("%s", &choice);
+        scanf(" %c", &choice);
+        
         if (choice == '1'){ 
             selectionSort(&q);
         }
-        else if (choice == '2'){
+        else if (choice == '2') {
             quickSort(&q);
         }
         else {
@@ -72,7 +71,8 @@ int main(int argc, char* argv[]) {
         freeQueue(&q);
 
         printf("Вы хотите повторить? 0 - выход:\n");
-        scanf("%s", &exit);
+        scanf(" %c", &exit);
     }
-        return 0;
+    
+    return 0;
 }

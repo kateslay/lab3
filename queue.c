@@ -120,3 +120,49 @@ int dequeue(Queue* q) {
     free(temp);
     return value;
 }
+
+// восстановление очереди перед каждым замером времени
+void restoreQueue(Queue* copy, Queue* orig) {
+    freeQueue(copy);
+    initQueue(copy);
+    
+    Queue temp;
+    initQueue(&temp);
+    
+    // Копируем элементы из orig в temp и copy
+    while (!isQueueEmpty(orig)) {
+        int value = dequeue(orig);
+        enqueue(copy, value);
+        enqueue(&temp, value);
+    }
+    
+    // Восстанавливаем orig из temp
+    while (!isQueueEmpty(&temp)) {
+        enqueue(orig, dequeue(&temp));
+    }
+}
+
+// копирование очереди
+Queue* copyQueue(Queue* orig) {
+    Queue* newQueue = (Queue*)malloc(sizeof(Queue));
+    if (!newQueue) return NULL;
+    
+    initQueue(newQueue);
+    
+    Queue temp;
+    initQueue(&temp);
+    
+    // Копируем элементы
+    while (!isQueueEmpty(orig)) {
+        int value = dequeue(orig);
+        enqueue(newQueue, value);
+        enqueue(&temp, value);
+    }
+    
+    // Восстанавливаем исходную очередь
+    while (!isQueueEmpty(&temp)) {
+        enqueue(orig, dequeue(&temp));
+    }
+    
+    return newQueue;
+}

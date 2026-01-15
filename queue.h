@@ -29,4 +29,7 @@ void display_file_content(const char* filename);
 int isQueueEmpty(Queue* q);
 int dequeue(Queue* q); 
 
+void restoreQueue(Queue* dest, Queue* src);
+Queue* copyQueue(Queue* src);  // Создает новую очередь-копию
+
 #endif

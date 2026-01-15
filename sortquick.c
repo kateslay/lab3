@@ -3,84 +3,73 @@
 #include "queue.h"
 #include <locale.h>
 
-// рекурсивная часть сортировки Хоара
-void hoareSortRecursive(Queue* q) {
-    if (q == NULL || q->BegL == NULL || q->BegL->next == NULL) {
-        return;
-    }
-
-    // первый элемент как опорный
-    Elem* pivot = q->BegL;
-    Elem* current = pivot->next;
-    pivot->next = NULL;
-
-    Queue left, right;
+// Рекурсивная часть быстрой сортировки
+void quickSortRecursive(Queue* q, int n) {
+    
+    int size = sizeQueue(q);
+    if (n <= 1) return;
+    
+    int pivot = dequeue(q);
+    Queue left, middle, right;
     initQueue(&left);
+    initQueue(&middle);
     initQueue(&right);
+    
+    int leftCount = 0;
+    int middleCount  = 1; //с pivot
+    int rightCount = 0;
 
-    // Распределяем элементы относительно опорного
-    while (current != NULL) {
-        Elem* next = current->next;
-        current->next = NULL;
-       if (current->data < pivot->data) {
-        enqueue(&left, current->data);
+    enqueue(&middle, pivot);
+    
+
+    while (n > 1) {
+        int el = dequeue(q);
+        if (el < pivot) {
+            enqueue(&left, el);
+            leftCount++;
+        } else if (el == pivot) {
+            enqueue(&middle, el);
+            middleCount ++;
+        } else {  // el > pivot
+            enqueue(&right, el);
+            rightCount++;
         }
-        else {
-            enqueue(&right, current->data);
-        }
-        free(current);
-        current = next;
+        n--;
     }
-
-    hoareSortRecursive(&left);
-    hoareSortRecursive(&right);
-
-    Queue result;
-    initQueue(&result);
-
-    // Добавляем left
-    if (left.BegL != NULL) {
-        result.BegL = left.BegL;
-        result.EndL = left.EndL;
+    
+    if (leftCount > 0) {
+        quickSortRecursive(&left, leftCount);
     }
-
-    // Добавляем pivot
-    if (result.BegL == NULL) {
-        result.BegL = pivot;
-        result.EndL = pivot;
+    if (rightCount > 0) {
+        quickSortRecursive(&right, rightCount);
     }
-    else {
-        result.EndL->next = pivot;
-        result.EndL = pivot;
+    
+    // left + middle + right
+    while (!isQueueEmpty(&left)) {
+        enqueue(q, dequeue(&left));
     }
-
-    // Добавляем right
-    if (right.BegL != NULL) {
-        if (result.BegL == NULL) {
-            result.BegL = right.BegL;
-            result.EndL = right.EndL;
-        }
-        else {
-            result.EndL->next = right.BegL;
-            result.EndL = right.EndL;
-        }
+    while (!isQueueEmpty(&middle)) {
+        enqueue(q, dequeue(&middle));
     }
-
-    q->BegL = result.BegL;
-    q->EndL = result.EndL;
-
+    while (!isQueueEmpty(&right)) {
+        enqueue(q, dequeue(&right));
+    }
+    
+    freeQueue(&left);
+    freeQueue(&middle);
+    freeQueue(&right);
 }
 
-// Основная функция сортировки Хоара
+// Основная функция быстрой сортировки
 void quickSort(Queue* q) {
     setlocale(LC_ALL, "Rus");
-    if (q == NULL || q->BegL == NULL || q->BegL->next == NULL) {
+    
+    if (q == NULL || isQueueEmpty(q)) {
         return;
     }
 
-    int n = sizeQueue(q);
-
-    int repetitions; //количество повторений
+    int n = sizeQueue(q);  
+    int repetitions;
 
     if (n < 10) repetitions = 100000;
     else if (n < 50) repetitions = 10000;  
@@ -90,44 +79,31 @@ void quickSort(Queue* q) {
     else if (n < 5000) repetitions = 100;    
     else if (n < 10000) repetitions = 50;     
     else if (n < 50000) repetitions = 10;   
-    else repetitions = 5;     
+    else repetitions = 5;
 
-    Queue original_template;
-    initQueue(&original_template);
+    // Сохраняем исходную очередь для замеров
+    Queue* original = copyQueue(q);
 
-    Elem* original_current = q->BegL;
-    while (original_current != NULL) {
-        enqueue(&original_template, original_current->data);
-        original_current = original_current->next;
+    clock_t total = 0;
+    
+
+    for (int i = 0; i < repetitions; i++) {
+        // Копируем оригинал в q для каждого замера
+        restoreQueue(q, original);  
+        
+        clock_t start = clock();
+        quickSortRecursive(q, n);           
+        clock_t end = clock();
+        total += (end - start);
     }
 
-    clock_t total_start = clock();
+    quickSortRecursive(q, n);  // Финальная сортировка
+    
+    freeQueue(original);
+    free(original);
+    
+    double seconds = (double)total / CLOCKS_PER_SEC;
+    double mcs = (seconds / repetitions) * 1000000.0;
 
-    for (int r = 0; r < repetitions; r++) {
-        freeQueue(q);
-        initQueue(q);
-
-        Queue temp_copy;
-        initQueue(&temp_copy);
-        Elem* temp_elem = original_template.BegL;
-        while (temp_elem != NULL) {
-            enqueue(&temp_copy, temp_elem->data);
-            temp_elem = temp_elem->next;
-        }
-
-        while (!isQueueEmpty(&temp_copy)) {
-            enqueue(q, dequeue(&temp_copy));
-        }
-
-        hoareSortRecursive(q);
-    }
-
-    clock_t total_end = clock();
-    freeQueue(&original_template);
-
-    // Вычисляем среднее время в микросекундах
-    double total_seconds = (double)(total_end - total_start) / CLOCKS_PER_SEC;
-    double mcs = (total_seconds / repetitions) * 1000000.0; //ср время в мкс
-
-    printf("%d элементов: %.3f мкс\n", n, mcs);
+    printf("%d элементов отсортировано за %.3f мкс\n", n, mcs);
 }
